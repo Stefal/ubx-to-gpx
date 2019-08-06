@@ -219,5 +219,4 @@ if __name__ == '__main__':
     with open(args.input + ".gpx", "w") as gpx_file:
         gpx_file.write(new_gpx.to_xml())
     #print('Created GPX:', new_gpx.to_xml())
-    print("Converting to gpx in {} seconds".format(time.time() - start_time)
-    
+    print("Converting to gpx in {} seconds".format(time.time() - start_time))
