@@ -193,8 +193,9 @@ if __name__ == '__main__':
             gpx_segment.points.append(new_point)
         
         except Exception as e:
-            print(e, "point :", new_point)
-            print("gpx time: ", gpx_time)
+            #print(e, "point :", new_point)
+            print("Error on", e)
+            #print("gpx time: ", gpx_time)
                      
     
     """
