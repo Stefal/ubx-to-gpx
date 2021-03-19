@@ -46,8 +46,8 @@ def arg_parse():
     parser.add_argument("--output", help="gpx out file")
     args = parser.parse_args()
     if args.output == None:
-        args.output = args.input + ".gpx"
-    print(args)
+        args.output = args.input.replace(".ubx", ".gpx")
+    print("% {}".format(args))
     #import ipdb; ipdb.set_trace()
     return args
     
@@ -92,8 +92,8 @@ def ubx_read_generator(ubx_file_path, type_filter=None):
                 yield data
                 
             if 0 >= consumed:
-                print(time.time())
-                print("time elapsed to read ubx: ", time.time() - start_time)
+                # print(time.time())
+                print("% Reading ubx in {:.3f} seconds".format(time.time() - start_time))
                 break
                     
 
@@ -141,10 +141,7 @@ if __name__ == '__main__':
     start_time = time.time()
     gps_model = ubx()
     args = arg_parse()
-    #input_file_name = 'c:/Users/Stéphane/Documents/RTK/data/COM12_190514_154853.ubx'
-    #input_file_name = 'c:/Users/Stéphane/Documents/RTK/data/rover_2019-05-14.16-51-07.ubx'
-    #output_file_name = 'c:/Users/Stéphane/Documents/RTK/data/rover.gpx'
-    
+
     new_gpx = gpxpy.gpx.GPX()
     # Create first track in our GPX:
     gpx_track = gpxpy.gpx.GPXTrack()
@@ -184,40 +181,44 @@ if __name__ == '__main__':
                 latitude = group['UBX-NAV-HPPOSLLH']['prec_lat'],
                 elevation = group['UBX-NAV-HPPOSLLH']['prec_height'],
                 time = gpx_time,
-                
+                #position_dilution=group['UBX-NAV-PVT']['pDOP'],
+                horizontal_dilution=group['UBX-NAV-PVT']['pDOP'],
                 )
             new_point.type_of_gpx_fix = fix_type
             new_point.satellites = group['UBX-NAV-PVT']['numSV']
-            new_point.position_dilution = group['UBX-NAV-PVT']['pDOP']
+            #new_point.position_dilution = group['UBX-NAV-PVT']['pDOP']
             
             gpx_segment.points.append(new_point)
+            # round microsecond to millisecond 
+            if gpx_time.microsecond > 999499 :
+                gpx_time = gpx_time + datetime.timedelta(seconds=1, microseconds = - gpx_time.microsecond)
+            else:
+                gpx_time = gpx_time.replace(microsecond = round(gpx_time.microsecond/1000))
+
+            sol_type = {False: 5, 'Float': 2, 'Fixed': 1}.get(group['UBX-NAV-PVT']['carrSoln'])
+            pos_time = '{0:%Y}/{0:%m}/{0:%d} {0:%H}:{0:%M}:{0:%S}.{0:%f}'.format(gpx_time)
+
+            print('{} {:14.9f} {:14.9f} {:10.4f} {:3d} {:3d} {:8.4f} {:8.4f} {:8.4f} {:8.4f} {:8.4f} {:8.4f} {:4.2f} {:6.1f}'.format(
+                pos_time,
+                group['UBX-NAV-HPPOSLLH']['prec_lat'],
+                group['UBX-NAV-HPPOSLLH']['prec_lon'],
+                group['UBX-NAV-HPPOSLLH']['prec_height'],
+                sol_type,
+                group['UBX-NAV-PVT']['numSV'],
+                group['UBX-NAV-HPPOSLLH']['hAcc']/10000.0,   # sdn(m)
+                group['UBX-NAV-HPPOSLLH']['hAcc']/10000.0,   # sde(m)
+                group['UBX-NAV-HPPOSLLH']['vAcc']/10000.0,   # sdu(m)
+                0.0,
+                0.0,
+                0.0,
+                0.0,    # age
+                0.0     # ratio
+            ))
         
         except Exception as e:
-            #print(e, "point :", new_point)
-            print("Error on", e)
-            #print("gpx time: ", gpx_time)
-                     
-    
-    """
-    mon_generateur = ubx_read_generator(input_file_name, ('UBX-NAV-PVT'))
-    for i, sent in enumerate(mon_generateur):
-        if i == 0:
-            print(sent['msg']['iTow'])
-    print("nombre de groupe", i)
-    print(sent['msg']['iTow'])
-    """
-            
-            
-    
-        
-    
-    """
-    for sentence in mon_generateur:
-        print(sentence['type'], sentence['msg']['iTow'], '\n')
-        timestamp = sentence['msg']['iTow'] if sentence['msg'].get('iTow') else None
-    """    
-        
-    with open(args.input + ".gpx", "w") as gpx_file:
+            print("%", group['iTow'], "Error :", e)
+
+
+    with open(args.input.replace(".ubx",".gpx"), "w") as gpx_file:
         gpx_file.write(new_gpx.to_xml())
-    #print('Created GPX:', new_gpx.to_xml())
-    print("Converting to gpx in {} seconds".format(time.time() - start_time))
+    print("% Converting to gpx in {:.3f} seconds".format(time.time() - start_time))
