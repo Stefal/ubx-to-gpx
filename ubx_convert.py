@@ -193,7 +193,6 @@ if __name__ == '__main__':
     start_time = time.time()
     gps_model = ubx()
     args = arg_parse()
-    print("ubx file : ", args.ubx)
     new_gpx = gpxpy.gpx.GPX()
     # Create first track in our GPX:
     gpx_track = gpxpy.gpx.GPXTrack()
@@ -258,7 +257,9 @@ if __name__ == '__main__':
             output_file.write("% program   : {}\n".format(args.prog + PROG_VERSION))
             output_file.write("% (lat/lon/height=WGS84/ellipsoidal,Q=1:fix,2:float,3:sbas,4:dgps,5:single,6:ppp,ns=# of satellites)\n")
             output_file.write("%  DateTime                  latitude(deg) longitude(deg)  height(m)   Q  ns   sdn(m)   sde(m)   sdu(m)  sdne(m)  sdeu(m)  sdun(m) age(s)  ratio\n")
-            output_file.writelines(pos_lines)    
-    #with open(args.ubx.replace(".ubx",".gpx"), "w") as gpx_file:
-    #    gpx_file.write(new_gpx.to_xml())
+            output_file.writelines(pos_lines)
+    if args.gpx:    
+        with open(args.output, "w", encoding="utf-8") as gpx_file:
+            gpx_file.write(new_gpx.to_xml())
+
     print("% Convertion done in {:.3f} seconds".format(time.time() - start_time))
