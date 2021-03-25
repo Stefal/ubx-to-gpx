@@ -254,7 +254,7 @@ if __name__ == '__main__':
 
     if args.pos:
         with open(args.output, "w", encoding="utf-8") as output_file:
-            output_file.write("% program   : {}\n".format(args.prog + PROG_VERSION))
+            output_file.write("% program   : {} {}\n".format(args.prog, PROG_VERSION))
             output_file.write("% (lat/lon/height=WGS84/ellipsoidal,Q=1:fix,2:float,3:sbas,4:dgps,5:single,6:ppp,ns=# of satellites)\n")
             output_file.write("%  DateTime                  latitude(deg) longitude(deg)  height(m)   Q  ns   sdn(m)   sde(m)   sdu(m)  sdne(m)  sdeu(m)  sdun(m) age(s)  ratio\n")
             output_file.writelines(pos_lines)
