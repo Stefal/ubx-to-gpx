@@ -162,14 +162,18 @@ def iTow_group_generator(ubx_file_path, type_filter=None):
             sentences_group[sentence['type']] = sentence['msg']
 
 def convert_to_pos_line(point_group, point_time):
-    # round microsecond to millisecond 
+    # round microsecond to millisecond
+    #print("time : ", point_time)
     if point_time.microsecond > 999499 :
         point_time = point_time + datetime.timedelta(seconds=1, microseconds = - point_time.microsecond)
-    else:
-        point_time = point_time.replace(microsecond = round(point_time.microsecond/1000))
+    milli = microsecond = round(point_time.microsecond/1000)
 
     sol_type = {False: 5, 'Float': 2, 'Fixed': 1}.get(group['UBX-NAV-PVT']['carrSoln'])
-    pos_time = '{0:%Y}/{0:%m}/{0:%d} {0:%H}:{0:%M}:{0:%S}.{0:%f}'.format(point_time)
+    #pos_time = '{0:%Y}/{0:%m}/{0:%d} {0:%H}:{0:%M}:{0:%S}.{0:%f}'.format(point_time)
+    pos_time = '{0:%Y}/{0:%m}/{0:%d} {0:%H}:{0:%M}:{0:%S}.'.format(point_time)
+    print("milli: ", str(milli).zfill(3))
+    pos_time += str(milli).zfill(3)
+    print(pos_time)
     pos_line = ('{} {:14.9f} {:14.9f} {:10.4f} {:3d} {:3d} {:8.4f} {:8.4f} {:8.4f} {:8.4f} {:8.4f} {:8.4f} {:4.2f} {:6.1f} \n'.format(
         pos_time,
         point_group['UBX-NAV-HPPOSLLH']['prec_lat'],
