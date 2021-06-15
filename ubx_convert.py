@@ -63,13 +63,16 @@ def arg_parse():
         "-o",
         "--output",
         nargs="?",
-        default=sys.stdout,
         help="Path to the output file",
     )
     args = parser.parse_args()
     args.prog = parser.prog
-    #if args.output == None:
-    #    args.output = args.input.replace(".ubx", ".gpx")
+    if args.output == None and args.gpx:
+        name, ext = os.path.splitext(args.ubx)
+        args.output = name + ".gpx"
+    elif args.output == None and args.pos:
+        name, ext = os.path.splitext(args.ubx)
+        args.output = name + ".pos"
 
     print("% {}".format(args))
     #import ipdb; ipdb.set_trace()
@@ -171,9 +174,9 @@ def convert_to_pos_line(point_group, point_time):
     sol_type = {False: 5, 'Float': 2, 'Fixed': 1}.get(group['UBX-NAV-PVT']['carrSoln'])
     #pos_time = '{0:%Y}/{0:%m}/{0:%d} {0:%H}:{0:%M}:{0:%S}.{0:%f}'.format(point_time)
     pos_time = '{0:%Y}/{0:%m}/{0:%d} {0:%H}:{0:%M}:{0:%S}.'.format(point_time)
-    print("milli: ", str(milli).zfill(3))
+    #print("milli: ", str(milli).zfill(3))
     pos_time += str(milli).zfill(3)
-    print(pos_time)
+    #print(pos_time)
     pos_line = ('{} {:14.9f} {:14.9f} {:10.4f} {:3d} {:3d} {:8.4f} {:8.4f} {:8.4f} {:8.4f} {:8.4f} {:8.4f} {:4.2f} {:6.1f} \n'.format(
         pos_time,
         point_group['UBX-NAV-HPPOSLLH']['prec_lat'],
@@ -234,7 +237,7 @@ if __name__ == '__main__':
                             second=int(complete_second // 1),
                             microsecond=round((complete_second % 1)*1E6))
                             
-            
+            print("timestamp: ", point_time)
             # Create points:
             new_point = gpxpy.gpx.GPXTrackPoint(
                 longitude = group['UBX-NAV-HPPOSLLH']['prec_lon'],
