@@ -237,7 +237,7 @@ if __name__ == '__main__':
                             second=int(complete_second // 1),
                             microsecond=round((complete_second % 1)*1E6))
                             
-            print("timestamp: ", point_time)
+            #print("timestamp: ", point_time)
             # Create points:
             new_point = gpxpy.gpx.GPXTrackPoint(
                 longitude = group['UBX-NAV-HPPOSLLH']['prec_lon'],
