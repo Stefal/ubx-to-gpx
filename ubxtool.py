@@ -2579,7 +2579,7 @@ class ubx(object):
         pvt_data['lat'], pvt_data['height'], pvt_data['hMSL'], pvt_data['hAcc'], pvt_data['vAcc'], \
         pvt_data['velN'], pvt_data['velE'], pvt_data['velD'], pvt_data['gSpeed'], pvt_data['headMot'], \
         pvt_data['sAcc'], pvt_data['headAcc'], pvt_data['pDOP'], pvt_data['reserved1'], _, _ = u
-
+        
         #Scale values
         pvt_data['lon'] = round(pvt_data['lon']*1E-7, 7)
         pvt_data['lat'] = round(pvt_data['lat']*1E-7, 7)
@@ -2611,9 +2611,12 @@ class ubx(object):
         pvt_data['diffSoln'] = True if pvt_data['flags'] & int('00000010', 2) else False
         #todo psmState
         pvt_data['headVehValid'] = True if pvt_data['flags'] & int('00100000', 2) else False
-        pvt_data['carrSoln'] = 'Float' if pvt_data['flags'] & int('01000000', 2) else False
-        pvt_data['carrSoln'] = 'Fixed' if pvt_data['flags'] & int('10000000', 2) else False
-        
+        if pvt_data['flags'] & int('01000000', 2):
+            pvt_data['carrSoln'] = 'Float'
+        elif pvt_data['flags'] & int('10000000', 2):
+            pvt_data['carrSoln'] = 'Fixed'
+        else:
+            pvt_data['carrSoln'] = False
         #flags2 flags
         pvt_data['confirmedAvai'] = True if pvt_data['flags'] & int('00100000', 2) else False
         pvt_data['confirmedDate'] = True if pvt_data['flags'] & int('01000000', 2) else False
