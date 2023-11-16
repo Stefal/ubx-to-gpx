@@ -43,7 +43,7 @@ def arg_parse():
     parser = argparse.ArgumentParser(description="Script to convert a ubx file to a gpx or pos file")
     parser.add_argument('--version', action='version', version='%(prog)s' + PROG_VERSION)
     parser.add_argument(
-        "ubx",
+        "ubx_file",
         help="Path to the ubx file",
     )
     group = parser.add_mutually_exclusive_group(required=True)
