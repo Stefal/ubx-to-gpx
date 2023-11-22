@@ -67,14 +67,15 @@ def arg_parse():
     )
     args = parser.parse_args()
     args.prog = parser.prog
+    print("% {}".format(args))
     if args.output == None and args.gpx:
-        name, ext = os.path.splitext(args.ubx)
+        name, ext = os.path.splitext(args.ubx_file)
         args.output = name + ".gpx"
     elif args.output == None and args.pos:
-        name, ext = os.path.splitext(args.ubx)
+        name, ext = os.path.splitext(args.ubx_file)
         args.output = name + ".pos"
 
-    print("% {}".format(args))
+    
     #import ipdb; ipdb.set_trace()
     return args
     
@@ -213,7 +214,7 @@ if __name__ == '__main__':
     if args.gpx:
         pass
 
-    iTow_group = iTow_group_generator(args.ubx, ('UBX-NAV-PVT', 'UBX-NAV-HPPOSLLH'))
+    iTow_group = iTow_group_generator(args.ubx_file, ('UBX-NAV-PVT', 'UBX-NAV-HPPOSLLH'))
     for group in iTow_group:
         
         try:
